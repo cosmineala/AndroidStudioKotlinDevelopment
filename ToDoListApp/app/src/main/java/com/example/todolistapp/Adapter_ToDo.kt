@@ -61,5 +61,14 @@ class Adapter_ToDo( private val listToDo: MutableList<Model_ToDo>) : RecyclerVie
         notifyDataSetChanged()
     }
 
+    fun AreItemsToRemove() : Boolean {
+        listToDo.forEach { item ->
+            if ( item.isChecked ){
+                return true
+            }
+        }
+        return false
+    }
+
 
 }

@@ -30,7 +30,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         btDeleteSelected.setOnClickListener {
-            adapter_ToDo.DelToDo()
+            if ( adapter_ToDo.AreItemsToRemove() ) {
+                adapter_ToDo.DelToDo()
+            }else{
+                Toast.makeText(this,"No item selected",Toast.LENGTH_SHORT).show()
+            }
         }
 
 
