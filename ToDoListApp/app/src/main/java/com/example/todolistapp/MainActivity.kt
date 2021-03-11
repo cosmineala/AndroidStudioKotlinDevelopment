@@ -1,5 +1,6 @@
 package com.example.todolistapp
 
+import android.content.pm.ActivityInfo
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -13,6 +14,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) // TODO -> Disables screen Totation
 
         adapter_ToDo = Adapter_ToDo( mutableListOf() )
         rvToDoItems.adapter = adapter_ToDo

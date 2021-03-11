@@ -30,4 +30,12 @@
         android:checked="false"
         />
 
+    <View
+        android:id="@+id/vbSeparator"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:background="@color/purple_500"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.example.todolistapp
 
+import android.graphics.Color
 import android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
 import android.view.LayoutInflater
 import android.view.View
@@ -43,9 +44,11 @@ class Adapter_ToDo( private val listToDo: MutableList<Model_ToDo>) : RecyclerVie
 
     private fun toggleStrikeThrough( tvToDoTitle: TextView, isChecked: Boolean ){
         if( isChecked ) {
+            tvToDoTitle.setTextColor( Color.RED )
             tvToDoTitle.paintFlags = tvToDoTitle.paintFlags or STRIKE_THRU_TEXT_FLAG
         } else {
             tvToDoTitle.paintFlags = tvToDoTitle.paintFlags and STRIKE_THRU_TEXT_FLAG.inv()
+            tvToDoTitle.setTextColor( Color.DKGRAY )
         }
     }
 
