@@ -18,9 +18,14 @@ import kotlinx.android.synthetic.main.item_todo.view.*
 import java.util.EnumSet.of
 import kotlin.coroutines.coroutineContext
 
-class TasksAdapter:  RecyclerView.Adapter<TasksAdapter.MyViewHolder>() {
+class TasksAdapter( listFragment: ListFragment ):  RecyclerView.Adapter<TasksAdapter.MyViewHolder>() {
 
     private var tasksList = emptyList<Task>()
+    private lateinit var listFragment: ListFragment
+
+    init {
+        this.listFragment = listFragment
+    }
 
     class MyViewHolder( itemView: View ): RecyclerView.ViewHolder(itemView){}
 
@@ -44,6 +49,8 @@ class TasksAdapter:  RecyclerView.Adapter<TasksAdapter.MyViewHolder>() {
             cbIsDone.setOnCheckedChangeListener{ _, isChecked ->
 
               // cbIsDone.isChecked = false
+
+                listFragment.tasksViewModel.UpdateTask( Task( currentItem.id, currentItem.text, currentItem.isDone.not() )  )
 
             }
         }

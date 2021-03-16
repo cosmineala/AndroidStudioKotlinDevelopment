@@ -20,8 +20,8 @@ interface TasksDao {
 //
 //
 //
-//    @Delete
-//    suspend fun Del( tasks: Task )
+    @Delete
+    suspend fun Del( tasks: Task )
 //    @Delete
 //    fun DelAll( vararg tasks: Task )
 

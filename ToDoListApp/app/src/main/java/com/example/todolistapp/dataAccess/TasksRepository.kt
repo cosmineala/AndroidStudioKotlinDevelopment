@@ -13,4 +13,8 @@ class TasksRepository( private val tasksDao: TasksDao) {
     suspend fun UpadateTask( task: Task ){
         tasksDao.Update(task)
     }
+
+    suspend fun DelTask( task: Task ){
+        tasksDao.Del(task)
+    }
 }

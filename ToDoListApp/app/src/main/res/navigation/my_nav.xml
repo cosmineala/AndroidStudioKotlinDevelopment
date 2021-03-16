@@ -8,6 +8,6 @@
     <fragment
         android:id="@+id/listFragment"
         android:name="com.example.todolistapp.listFragment.ListFragment"
-        android:label="fragment_list"
+        android:label="Task List"
         tools:layout="@layout/fragment_list" />
 </navigation>
