@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 class TasksViewModel( application: Application ): AndroidViewModel(application) {
 
-    private val getAll: LiveData<List<Task>>
+    val getAll: LiveData<List<Task>>
     private val repository: TasksRepository
 
     init {
@@ -21,6 +21,12 @@ class TasksViewModel( application: Application ): AndroidViewModel(application) 
     fun AddTask( task: Task ){
         viewModelScope.launch(Dispatchers.IO){
             repository.AddTask( task )
+        }
+    }
+
+    fun UpdateTask( task: Task ){
+        viewModelScope.launch(Dispatchers.IO){
+            repository.UpadateTask( task )
         }
     }
 

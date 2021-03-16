@@ -10,13 +10,14 @@ interface TasksDao {
     fun GetAll(): LiveData<List<Task>>
 
     @Insert
-    fun Add( task: Task )
+    suspend fun Add( task: Task )
 
-//    @Insert
+    @Update
+    suspend fun Update( task: Task )
+
+    //    @Insert
 //    fun AddAll( vararg tasks: Task )
 //
-//    @Update
-//    fun Update( task: Task )
 //
 //
 //    @Delete
