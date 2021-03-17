@@ -41,20 +41,21 @@ class TasksAdapter( listFragment: ListFragment ):  RecyclerView.Adapter<TasksAda
         val currentItem = tasksList[position]
 
         holder.itemView.apply {
+
+            // NOTE Ne need to desable Listener to no trigger accidental Check box confirmation on other items
+            cbIsDone.setOnCheckedChangeListener(null)
+
+            // NOTE Bind the data and aplay the visual efects
             tvToDoTitle.text = currentItem.text
             cbIsDone.isChecked = currentItem.isDone
-
             toggleStrikeThrough( tvToDoTitle, currentItem.isDone )
 
+            // NOTE Set Listener so the state can be updated
             cbIsDone.setOnCheckedChangeListener{ _, isChecked ->
-
-              // cbIsDone.isChecked = false
-
                 listFragment.tasksViewModel.UpdateTask( Task( currentItem.id, currentItem.text, currentItem.isDone.not() )  )
-
             }
-        }
 
+        }
     }
 
     override fun getItemCount(): Int {
