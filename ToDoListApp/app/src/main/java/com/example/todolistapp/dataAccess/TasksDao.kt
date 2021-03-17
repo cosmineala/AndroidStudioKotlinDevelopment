@@ -15,14 +15,18 @@ interface TasksDao {
     @Update
     suspend fun Update( task: Task )
 
-    //    @Insert
-//    fun AddAll( vararg tasks: Task )
-//
-//
-//
+    @Query( "DELETE FROM Tasks WHERE isDone = 1" )
+    suspend fun DelAllDone()
+
+    @Query("SELECT COUNT( * ) FROM Tasks WHERE isDone = 1")
+    suspend fun GetDoneCount(): Int
+
+    @Query("SELECT * FROM Tasks WHERE isDone = 1")
+    suspend fun GetAllDone(): List<Task>
+
     @Delete
     suspend fun Del( tasks: Task )
-//    @Delete
-//    fun DelAll( vararg tasks: Task )
+
+
 
 }

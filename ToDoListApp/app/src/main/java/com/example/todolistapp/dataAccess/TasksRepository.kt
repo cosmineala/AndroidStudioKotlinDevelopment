@@ -17,4 +17,13 @@ class TasksRepository( private val tasksDao: TasksDao) {
     suspend fun DelTask( task: Task ){
         tasksDao.Del(task)
     }
+
+    suspend fun DelAllDone(){
+        tasksDao.DelAllDone()
+    }
+
+    suspend fun GetDoneCount(): Int{
+        return tasksDao.GetDoneCount()
+    }
+
 }

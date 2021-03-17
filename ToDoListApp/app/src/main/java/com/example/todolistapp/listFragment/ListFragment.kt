@@ -1,10 +1,13 @@
 package com.example.todolistapp.listFragment
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.todolistapp.dataAccess.TasksViewModel
@@ -13,8 +16,6 @@ import com.example.todolistapp.R
 import com.example.todolistapp.dataAccess.Task
 import kotlinx.android.synthetic.main.fragment_list.*
 import kotlinx.android.synthetic.main.fragment_list.view.*
-import kotlinx.android.synthetic.main.item_todo.*
-import kotlinx.android.synthetic.main.item_todo.view.*
 
 
 class ListFragment : Fragment() {
@@ -40,20 +41,44 @@ class ListFragment : Fragment() {
         view.btAddToToDo.setOnClickListener {
 
            // val text = view.etToDoInput.text.toString()
-            val task = Task( 0, view.etToDoInput.text.toString() , false)
-            tasksViewModel.AddTask( task )
-            etToDoInput.text.clear()
+
+            if ( view.etToDoInput.text.isNotEmpty() ){
+                val task = Task( 0, view.etToDoInput.text.toString() , false)
+                tasksViewModel.AddTask( task )
+                etToDoInput.text.clear()
+            }else{
+                Toast.makeText( activity , "Input is recurred",Toast.LENGTH_SHORT ).show()
+            }
+
 
         }
 
         view.btDeleteSelected.setOnClickListener {
-            val list = tasksViewModel.getAll
 
-            list.value?.forEach { value ->
-                if ( value.isDone ){
-                    tasksViewModel.DelTask(value)
-                }
+            val isDoneCount = tasksViewModel.GetDoneCount()
+
+            if ( isDoneCount > 0 ){
+
+                AlertDialog.Builder( activity )
+                        .setTitle("Del Confirmation")
+                        .setMessage("You want to delet ${isDoneCount} done tasks ?")
+                        .setPositiveButton( "Confirm",
+                                DialogInterface.OnClickListener{ _, action ->
+                                    tasksViewModel.DelAllDone()
+
+                                })
+                        .setNegativeButton("Clancel",
+                                DialogInterface.OnClickListener{_, action ->
+                                    Toast.makeText( activity , "Del canceled",Toast.LENGTH_SHORT ).show()
+                                })
+                        .create()
+                        .show()
+            }else{
+                Toast.makeText( activity , "No items to Del",Toast.LENGTH_SHORT ).show()
             }
+
+
+
         }
 
 
