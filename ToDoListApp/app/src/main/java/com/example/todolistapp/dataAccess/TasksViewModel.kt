@@ -50,4 +50,10 @@ class TasksViewModel( application: Application ): AndroidViewModel(application) 
         return count
     }
 
+    fun SwapTasks( task1: Task, task2: Task ){
+        viewModelScope.launch( Dispatchers.IO ) {
+            repository.SwapTasks( task1, task2 )
+        }
+    }
+
 }

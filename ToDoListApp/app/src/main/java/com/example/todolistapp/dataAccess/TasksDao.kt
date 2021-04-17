@@ -6,7 +6,7 @@ import androidx.room.*
 @Dao
 interface TasksDao {
 
-    @Query("SELECT * FROM Tasks ORDER BY id ASC")
+    @Query("SELECT * FROM Tasks ORDER BY position ASC")
     fun GetAll(): LiveData<List<Task>>
 
     @Insert
@@ -26,6 +26,9 @@ interface TasksDao {
 
     @Delete
     suspend fun Del( tasks: Task )
+
+    @Query("SELECT MAX(position) from TASKS")
+    suspend fun GetLastPosition(): Int
 
 
 
