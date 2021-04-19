@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity( tableName = "Tasks" )
 data class Task(
-        @PrimaryKey(autoGenerate = true) var id: Int,
+        @PrimaryKey(autoGenerate = true) var id: Int = 0,
         var text: String,
         var isDone: Boolean,
         var position: Int = Int.MAX_VALUE

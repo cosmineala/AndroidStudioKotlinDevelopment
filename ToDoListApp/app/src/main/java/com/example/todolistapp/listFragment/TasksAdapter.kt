@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.RecyclerView
@@ -16,10 +15,8 @@ import com.example.todolistapp.R
 import com.example.todolistapp.dataAccess.Task
 import com.example.todolistapp.dataAccess.TasksViewModel
 import kotlinx.android.synthetic.main.item_todo.view.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
-class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  RecyclerView.Adapter<TasksAdapter.MyViewHolder>() {
+class TasksAdapter( listFragment: ListFragment, val recyclerView: RecyclerView ):  RecyclerView.Adapter<TasksAdapter.TaskItemViewHolder>() {
 
     private var tasksList = emptyList<Task>()
     private val tasksViewModel = ViewModelProvider(listFragment).get( TasksViewModel::class.java )
@@ -30,13 +27,13 @@ class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  R
                 .attachToRecyclerView( recyclerView )
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder{
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskItemViewHolder{
 
-        val viewHolder = MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_todo, parent, false))
+        val viewHolder = TaskItemViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_todo, parent, false))
         return viewHolder
     }
 
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TaskItemViewHolder, position: Int) {
 
         val currentItem = tasksList[position]
 
@@ -61,13 +58,18 @@ class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  R
     }
 
     fun setData( tasksList: List<Task> ){
-
         if ( updateManager.canUpdate() )
         {
             this.tasksList = tasksList
             notifyDataSetChanged()
         }
+    }
 
+    fun smoothScrollToLast(){
+        if ( tasksList.size > 0 )
+        {
+            recyclerView.smoothScrollToPosition(tasksList.size - 1)
+        }
     }
 
     private fun toggleStrikeThrough(tvToDoTitle: TextView, isChecked: Boolean ){
@@ -80,7 +82,7 @@ class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  R
         }
     }
 
-    class MyViewHolder( itemView: View ): RecyclerView.ViewHolder(itemView){}
+    class TaskItemViewHolder(itemView: View ): RecyclerView.ViewHolder(itemView){}
 
     private fun createTouchCallback(): SimpleCallback
 
@@ -102,7 +104,9 @@ class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  R
                 return true
             }
 
-            override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+        override fun onSwiped( viewHolder: RecyclerView.ViewHolder, direction: Int ) {}
+
+        override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
 
                 when( actionState ){
@@ -124,10 +128,7 @@ class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  R
                     }
 
                 }
-
             }
-
-            override fun onSwiped( viewHolder: RecyclerView.ViewHolder, direction: Int ) {}
     }
 
     class UpdateManager(){
