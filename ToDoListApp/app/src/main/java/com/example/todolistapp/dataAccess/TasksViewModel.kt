@@ -8,13 +8,13 @@ import kotlinx.coroutines.*
 
 class TasksViewModel( application: Application ): AndroidViewModel(application) {
 
-    val getAll: LiveData<List<Task>>
+    val getAllLive: LiveData<List<Task>>
     private val repository: TasksRepository
 
     init {
         val tasksDao = TasksDatabase.GetDatabase( application ).TasksDao()
         repository = TasksRepository( tasksDao )
-        getAll = repository.readAllData
+        getAllLive = repository.getAllLive
     }
 
     fun AddTask( task: Task ){
@@ -22,19 +22,34 @@ class TasksViewModel( application: Application ): AndroidViewModel(application) 
             repository.AddTask( task )
         }
     }
+    fun AddTask( tasks: List<Task> ){
+        viewModelScope.launch(Dispatchers.IO){
+            repository.AddTask( tasks )
+        }
+    }
 
-    fun UpdateTask( task: Task ){
+    fun UpdateTask(task: Task){
         viewModelScope.launch(Dispatchers.IO){
             repository.UpadateTask( task )
         }
     }
+    fun UpdateTask( tasks: List<Task> ){
+        viewModelScope.launch(Dispatchers.IO){
+            repository.UpadateTask( tasks )
+        }
+    }
+
 
     fun DelTask( task: Task ){
         viewModelScope.launch(Dispatchers.IO){
             repository.DelTask( task )
         }
     }
-
+    fun DelAll(){
+        viewModelScope.launch(Dispatchers.IO){
+            repository.DelAll()
+        }
+    }
     fun DelAllDone(){
         viewModelScope.launch(Dispatchers.IO){
             repository.DelAllDone()
@@ -50,10 +65,14 @@ class TasksViewModel( application: Application ): AndroidViewModel(application) 
         return count
     }
 
-    fun SwapTasks( task1: Task, task2: Task ){
-        viewModelScope.launch( Dispatchers.IO ) {
-            repository.SwapTasks( task1, task2 )
+    fun getNumberOfItems(): Int{
+        var number = 0
+        runBlocking{
+            number = repository.getNumberOfItems()
         }
+        return number
     }
+
+
 
 }
