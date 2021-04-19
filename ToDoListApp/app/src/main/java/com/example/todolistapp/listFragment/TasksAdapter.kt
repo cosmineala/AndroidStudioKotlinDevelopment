@@ -22,32 +22,17 @@ import kotlinx.coroutines.launch
 class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  RecyclerView.Adapter<TasksAdapter.MyViewHolder>() {
 
     private var tasksList = emptyList<Task>()
-
-    var ignoreUpdates = 0
-
-    val ignoreUpdatesLock = object{}
-
-    val tasksViewModel = ViewModelProvider(listFragment).get( TasksViewModel::class.java )
-
-    private val listFragment: ListFragment
-
-        val simpleItemTouchCallback = createTouchCallback()
+    private val tasksViewModel = ViewModelProvider(listFragment).get( TasksViewModel::class.java )
+    private val updateManager = UpdateManager()
 
     init {
-        this.listFragment = listFragment
-
-        ItemTouchHelper(simpleItemTouchCallback)
+        ItemTouchHelper(createTouchCallback())
                 .attachToRecyclerView( recyclerView )
     }
 
-    class MyViewHolder( itemView: View ): RecyclerView.ViewHolder(itemView){
-    }
-
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder{
 
         val viewHolder = MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_todo, parent, false))
-
         return viewHolder
     }
 
@@ -55,26 +40,21 @@ class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  R
 
         val currentItem = tasksList[position]
 
-        holder.itemView.apply {
+        holder.itemView.apply{
 
-            // NOTE Ne need to desable Listener to no trigger accidental Check box confirmation on other items
             cbIsDone.setOnCheckedChangeListener(null)
 
-            // NOTE Bind the data and aplay the visual efects
             tvToDoTitle.text = currentItem.text
             cbIsDone.isChecked = currentItem.isDone
             toggleStrikeThrough( tvToDoTitle, currentItem.isDone )
 
-            // NOTE Set Listener so the state can be updated
             cbIsDone.setOnCheckedChangeListener{ _, isChecked ->
                 currentItem.isDone = isChecked
-                listFragment.tasksViewModel.UpdateTask( currentItem )
+                tasksViewModel.UpdateTask( currentItem )
             }
 
         }
     }
-
-
 
     override fun getItemCount(): Int {
         return tasksList.size
@@ -82,17 +62,12 @@ class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  R
 
     fun setData( tasksList: List<Task> ){
 
-        if( ignoreUpdates == 0 )
+        if ( updateManager.canUpdate() )
         {
             this.tasksList = tasksList
             notifyDataSetChanged()
         }
-        else
-        {
-            synchronized( ignoreUpdatesLock ){
-                ignoreUpdates--
-            }
-        }
+
     }
 
     private fun toggleStrikeThrough(tvToDoTitle: TextView, isChecked: Boolean ){
@@ -105,10 +80,11 @@ class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  R
         }
     }
 
+    class MyViewHolder( itemView: View ): RecyclerView.ViewHolder(itemView){}
+
     private fun createTouchCallback(): SimpleCallback
 
         = object : ItemTouchHelper.SimpleCallback(UP or DOWN or START or END, 0) {
-
 
             override fun onMove( recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
 
@@ -121,22 +97,10 @@ class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  R
                 if ( selectedTask != null && reactTask != null )
                 {
                     Task.swapPossitions(selectedTask, reactTask)
-
-                    listFragment.lifecycleScope.launch {
-
-                        synchronized(ignoreUpdatesLock){
-                            ignoreUpdates++
-                        }
-
-                        val tasks = listOf(selectedTask, reactTask) as List<Task>
-                        tasksViewModel.UpdateTask(tasks)
-                    }
                     notifyItemMoved(to, from)
                 }
                 return true
             }
-
-            override fun onSwiped( viewHolder: RecyclerView.ViewHolder, direction: Int ) {}
 
             override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
@@ -152,6 +116,9 @@ class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  R
                         else
                         {
                             viewHolder.itemView.setBackgroundColor(Color.WHITE)
+
+                            updateManager.ignore(1)
+                            tasksViewModel.UpdateTask( tasksList )
                         }
 
                     }
@@ -160,8 +127,32 @@ class TasksAdapter( listFragment: ListFragment, recyclerView: RecyclerView ):  R
 
             }
 
+            override fun onSwiped( viewHolder: RecyclerView.ViewHolder, direction: Int ) {}
+    }
 
+    class UpdateManager(){
+        private var number = 0
+        private val lock = object{}
 
+        fun ignore( number: Int ){
+            synchronized( lock ){
+                this.number += number
+            }
+        }
+
+        fun canUpdate(): Boolean{
+            synchronized(lock){
+                if ( number > 0 )
+                {
+                    number--
+                    return false
+                }
+                else
+                {
+                    return true
+                }
+            }
+        }
     }
 
 
